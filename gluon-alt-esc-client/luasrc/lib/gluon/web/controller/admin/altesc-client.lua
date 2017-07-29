@@ -4,4 +4,4 @@
 --	entry({"admin", "altesc-client"}, cbi("admin/altesc-client"), _("Alt-ESC Client"), 10)
 --end
 
-entry({"admin", "altesc-client"}, model("admin/altesc-client"), _("Alt-ESC Client"), 10)
+entry({"admin", "altesc-client"}, model("admin/altesc-client"), _("Alt-ESC Client"), 25)
