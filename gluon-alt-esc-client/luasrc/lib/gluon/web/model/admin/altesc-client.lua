@@ -4,14 +4,14 @@ local site = require 'gluon.site_config'
 local hash = require 'hash'
 
 local function get_client(uci)
-  local client
-  uci:foreach('gluon-alt-esc-client', 'client',
-              function(s)
-                 client = s
-                 return false
-              end
-  )
-  return client
+	local client
+	uci:foreach('gluon-alt-esc-client', 'client',
+							function(s)
+								 client = s
+								 return false
+							end
+	)
+	return client
 end
 
 local client = get_client(uci)['.name']
@@ -20,9 +20,9 @@ local disabled = uci:get_first('gluon-alt-esc-client', 'client', "disabled")
 local site_code
 
 if site.site_code then
-  sitecode = site.site_code
+	sitecode = site.site_code
 else
-  sitecode = "ff"
+	sitecode = "ff"
 end
 
 -- reserve space for suffixes, SSID limited to 32 characters by standard
@@ -31,12 +31,12 @@ local ssiddata = uci:get('wireless', 'altesc_radio0', "ssid")
 
 -- Remove sitecode suffix
 if ssiddata and string.match(ssiddata, " #" .. sitecode .. "$") then
-  ssiddata = string.match(ssiddata, "^(.*) #" .. sitecode .. "$")
+	ssiddata = string.match(ssiddata, "^(.*) #" .. sitecode .. "$")
 end
 
 -- Remove zone suffix
 if ssiddata and string.match(ssiddata, " #%x%x%x%x$") then
-  ssiddata = string.match(ssiddata, "^(.*) #%x%x%x%x$")
+	ssiddata = string.match(ssiddata, "^(.*) #%x%x%x%x$")
 end
 
 local f = Form(translate("Alternative Exit Service Collaborator - Client"))
@@ -81,52 +81,52 @@ altesc_on_lan:depends(enabled, true)
 altesc_on_lan.default = landata and landata == '1'
 
 function f:write(self, state, data)
-  local client = get_client(uci)['.name']
+	local client = get_client(uci)['.name']
 
-  uci:set('gluon-alt-esc-client', client, 'disabled', enabled.data and '0' or '1')
-  uci:set('gluon-alt-esc-client', client, 'exit4', exit4.data or '')
-  uci:set('gluon-alt-esc-client', client, 'exit6', exit6.data or '')
-  uci:set('gluon-alt-esc-client', client, 'altesc_on_lan', altesc_on_lan.data and '1' or '0')
+	uci:set('gluon-alt-esc-client', client, 'disabled', enabled.data and '0' or '1')
+	uci:set('gluon-alt-esc-client', client, 'exit4', exit4.data or '')
+	uci:set('gluon-alt-esc-client', client, 'exit6', exit6.data or '')
+	uci:set('gluon-alt-esc-client', client, 'altesc_on_lan', altesc_on_lan.data and '1' or '0')
 
-  uci:commit('gluon-alt-esc-client')
+	uci:commit('gluon-alt-esc-client')
 
-  i=0
-  util.iterate_radios(uci,
-    function(radio, index)
-      local name = "altesc_" .. radio
+	i=0
+	util.iterate_radios(uci,
+		function(radio, index)
+			local name = "altesc_" .. radio
 
-      if enabled.data then
-        local macaddr = util.get_wlan_mac(uci, radio, index, 4)
-        local exit4data = exit4.data or ""
-        local exit6data = exit4.data or ""
-        local sitecode
-        local zone = string.sub(hash.md5(exit4data .. "," .. exit6data .. "," .. ssid.data), 0, 4)
+			if enabled.data then
+				local macaddr = util.get_wlan_mac(uci, radio, index, 4)
+				local exit4data = exit4.data or ""
+				local exit6data = exit4.data or ""
+				local sitecode
+				local zone = string.sub(hash.md5(exit4data .. "," .. exit6data .. "," .. ssid.data), 0, 4)
 
-        if site.site_code then
-          sitecode = site.site_code
-        else
-          sitecode = "ff"
-        end
+				if site.site_code then
+					sitecode = site.site_code
+				else
+					sitecode = "ff"
+				end
 
-        uci:section('wireless', "wifi-iface", name,
-                    {
-                      ifname = "altesc" .. i,
-                      device = radio,
-                      network = "client",
-                      mode = "ap",
-                      macaddr = macaddr,
-                      ssid = ssid.data .. " #" .. zone .. " #" .. sitecode,
-                      disabled = '0',
-                    }
-        )
-      else
-        uci:set('wireless', name, "disabled", 1)
-      end
+				uci:section('wireless', "wifi-iface", name,
+					{
+						ifname = "altesc" .. i,
+						device = radio,
+						network = "client",
+						mode = "ap",
+						macaddr = macaddr,
+						ssid = ssid.data .. " #" .. zone .. " #" .. sitecode,
+						disabled = '0',
+					}
+				)
+			else
+				uci:set('wireless', name, "disabled", 1)
+			end
 
-      i=i+1
-    end
-  )
-  uci:commit('wireless')
+			i=i+1
+		end
+	)
+	uci:commit('wireless')
 end
 
 return f
