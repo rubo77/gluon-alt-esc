@@ -18,9 +18,12 @@ local disabled = uci:get_first('gluon-alt-esc-provider', 'provider', "disabled")
 
 local f = Form(translate("Alternative Exit Service Collaborator - Provider"))
 local s = f:section(Section, nil, translate(
-		'<p>This allows you to share an internet connection from the WAN port directly.</p>'
-                .. '<p>Be aware of the legal obligations your jurisdiction might require you to follow.</p>'
-                .. '<p>USE AT YOUR OWN RISK!</p>'
+		'<p>Here you can share your Internet connection from the WAN port directly '
+		.. '(bypassing the Freifunk Gateways), so this same or other nodes can '
+		.. 'get Internet access via this node via Alt-ESC-Client.</p>'
+		.. '<p><strong>- Be aware of the legal obligations your jurisdiction might '
+		.. 'require you to follow. -</strong></p>'
+		.. '<p><strong>USE AT YOUR OWN RISK!</strong></p>'
 ))
 
 local enabled = s:option(Flag, "enabled", translate("Enabled"))
@@ -30,7 +33,7 @@ local brave = s:option(Flag, "brave", translate("I am brave and I know what I am
 brave:depends(enabled, true)
 brave.default = disabled and disabled == "0"
 
-local id = s:option(Value, "id", translate("Your Exit ID is:"), translate("(unchangeable)"))
+local id = s:option(Value, "id", translate("The MAC for your exit is:"), translate("(unchangeable, usually your nodes MAC)"))
 id:depends(brave, true)
 id.default = mac
 
