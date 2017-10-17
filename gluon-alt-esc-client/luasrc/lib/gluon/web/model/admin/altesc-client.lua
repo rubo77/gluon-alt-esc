@@ -6,10 +6,10 @@ local hash = require 'hash'
 local function get_client(uci)
 	local client
 	uci:foreach('gluon-alt-esc-client', 'client',
-							function(s)
-								 client = s
-								 return false
-							end
+		function(s)
+			 client = s
+			 return false
+		end
 	)
 	return client
 end
@@ -41,16 +41,16 @@ end
 
 local f = Form(translate("Alternative Exit Service Collaborator - Client"))
 local s = f:section(Section, nil, translate(
-		'Here you can add a WiFi interface with an alternative gateway for its '
-		.. 'Internet connectivity. Usually, you connect to a node, that has the '
-		.. 'Alt-ESC-Provider package activated (although other systems can '
-		.. 'provide access too).'
+	'Here you can add a WiFi interface with an alternative gateway for its '
+	.. 'Internet connectivity. Usually, you connect to a node, that has the '
+	.. 'Alt-ESC-Provider package activated (although other systems can '
+	.. 'provide access too).'
 ))
 
-local enabled = s:option(Flag, "enabled", translate("Enabled"))
+local enabled = s:option(Flag, "enabled", translate("Enable"))
 enabled.default = ssiddata and disabled and disabled == "0"
 
-local ssid = s:option(Value, "ssid", translate("Name (SSID)"))
+local ssid = s:option(Value, "ssid", translate("Name (SSID)"), translate('i.e. "Freifunk-Direkt"'))
 ssid:depends(enabled, true)
 ssid.datatype = "maxlength(" .. ssidlen .. ")"
 ssid.default = ssiddata
@@ -60,7 +60,7 @@ local exit4flag = s:option(Flag, "exit4flag", translate("redirect IPv4 to an Alt
 exit4flag:depends(enabled, true)
 exit4flag.default = (exit4data and exit4data ~= "")
 
-local exit4 = s:option(Value, "exit4", translate("MAC of the node, that serves as Alt-ESC-Provider"))
+local exit4 = s:option(Value, "exit4", "Exit ID for IPv4", translate("MAC of the node, that serves as Alt-ESC-Provider"))
 exit4:depends(exit4flag, true)
 --exit4.datatype = "macaddr"
 exit4.default = exit4data
@@ -70,7 +70,7 @@ local exit6flag = s:option(Flag, "exit6flag", translate("redirect IPv6 to an Alt
 exit6flag:depends(enabled, true)
 exit6flag.default = (exit6data and exit6data ~= "")
 
-local exit6 = s:option(Value, "exit6", translate("MAC of the node, that serves as Alt-ESC-Provider"))
+local exit6 = s:option(Value, "exit6", "Exit ID for IPv6", translate("MAC of the node, that serves as Alt-ESC-Provider"))
 exit6:depends(exit6flag, true)
 --exit6.datatype = "macaddr"
 exit6.default = exit6data
