@@ -38,10 +38,10 @@ setup_onlink_prefixes() {
 	fi
 
 	for p4 in $prefix4 $extra_prefixes4; do
-		eval ebtables -t nat "$M" ALT_ESC_OFFLINK -p IPv4 --ip-dst $p4 -j RETURN $OUT
+		eval ebtables --concurrent -t nat "$M" ALT_ESC_OFFLINK -p IPv4 --ip-dst $p4 -j RETURN $OUT
 	done
 	for p6 in $prefix6 $extra_prefixes6; do
-		eval ebtables -t nat "$M" ALT_ESC_OFFLINK -p IPv6 --ip6-dst $p6 -j RETURN $OUT
+		eval ebtables --concurrent -t nat "$M" ALT_ESC_OFFLINK -p IPv6 --ip6-dst $p6 -j RETURN $OUT
 	done
 }
 
@@ -56,7 +56,7 @@ start() {
 	[ ! "$disabled" = "0" ] && exit 0
 
 	for i in $ifnames; do
-		ebtables -t nat -A ALT_ESC -i $i --logical-in br-client -j ALT_ESC_OFFLINK
+		ebtables --concurrent -t nat -A ALT_ESC -i $i --logical-in br-client -j ALT_ESC_OFFLINK
 	done
 
 	setup_onlink_prefixes
@@ -64,23 +64,23 @@ start() {
 
 	[ -n "$exit4" ] && {
 		if [ "$ownmac" = "$exit4" ]; then
-			ebtables -t nat -A ALT_ESC_DNAT -p IPv4 -j redirect --redirect-target ACCEPT
+			ebtables --concurrent -t nat -A ALT_ESC_DNAT -p IPv4 -j redirect --redirect-target ACCEPT
 		else
-			ebtables -t nat -A ALT_ESC_DNAT -p IPv4 -j dnat --to-dst "$exit4" --dnat-target ACCEPT
+			ebtables --concurrent -t nat -A ALT_ESC_DNAT -p IPv4 -j dnat --to-dst "$exit4" --dnat-target ACCEPT
 		fi
 	}
 
 	[ -n "$exit6" ] && {
 		if [ "$ownmac" = "$exit6" ]; then
-			ebtables -t nat -A ALT_ESC_DNAT -p IPv6 -j redirect --redirect-target ACCEPT
+			ebtables --concurrent -t nat -A ALT_ESC_DNAT -p IPv6 -j redirect --redirect-target ACCEPT
 		else
-			ebtables -t nat -A ALT_ESC_DNAT -p IPv6 -j dnat --to-dst "$exit6" --dnat-target ACCEPT
+			ebtables --concurrent -t nat -A ALT_ESC_DNAT -p IPv6 -j dnat --to-dst "$exit6" --dnat-target ACCEPT
 		fi
 	}
 }
 
 stop() {
-	ebtables -t nat -F ALT_ESC_DNAT
-	ebtables -t nat -F ALT_ESC
+	ebtables --concurrent -t nat -F ALT_ESC_DNAT
+	ebtables --concurrent -t nat -F ALT_ESC
 	setup_onlink_prefixes "-D"
 }

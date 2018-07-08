@@ -33,6 +33,7 @@ endef
 define Package/gluon-alt-esc-provider/install
 	$(CP) ./files/* $(1)/
 	$(CP) $(PKG_BUILD_DIR)/luadest/* $(1)/
+	$(call GluonInstallI18N,gluon-alt-esc-provider,$(1))
 endef
 
 $(eval $(call BuildPackage,gluon-alt-esc-provider))

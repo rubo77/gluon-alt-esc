@@ -3,7 +3,7 @@
 disabled=`uci get gluon-alt-esc-client.@client[0].disabled`
 
 if [ ! "$disabled" = "0" ]; then
-	ebtables -t nat -F ALT_ESC_STDGW
+	ebtables --concurrent -t nat -F ALT_ESC_STDGW
 	exit 0
 fi
 
@@ -24,10 +24,10 @@ if [ "$gwhostssum" = "$oldgwhostssum" ]; then
 	exit 0
 fi
 
-ebtables -t nat -F ALT_ESC_STDGW
+ebtables --concurrent -t nat -F ALT_ESC_STDGW
 
 for host in $gwhosts; do
-	ebtables -t nat -A ALT_ESC_STDGW -d "$host" -j ALT_ESC_DNAT
+	ebtables --concurrent -t nat -A ALT_ESC_STDGW -d "$host" -j ALT_ESC_DNAT
 done
 
 echo "$gwhosts" > /var/run/gluon-alt-esc.hosts
